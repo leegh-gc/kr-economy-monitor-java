@@ -1,0 +1,56 @@
+/* 한국 경제 & 부동산 대시보드 커스텀 스타일 */
+
+body {
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+    font-size: 14px;
+}
+
+.nav-tabs .nav-link {
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    padding: 0.75rem 1.25rem;
+}
+
+.nav-tabs .nav-link.active {
+    border-bottom-color: #0d6efd;
+    color: #0d6efd !important;
+    font-weight: 600;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    border-bottom-color: #dee2e6;
+}
+
+.card {
+    border: none;
+    border-radius: 0.75rem;
+}
+
+.card-header {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 0.875rem 1.25rem;
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+}
+
+.analysis-text {
+    line-height: 1.7;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.analysis-text p { margin-bottom: 0.5rem; }
+.analysis-text h3, .analysis-text h4, .analysis-text h5 { color: #333; }
+.analysis-text ul { padding-left: 1.2rem; }
+.analysis-text li { margin-bottom: 0.25rem; }
+
+/* 스피너 애니메이션 */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .container-xl { padding: 0 0.75rem; }
+    .card-header { font-size: 0.875rem; }
+}

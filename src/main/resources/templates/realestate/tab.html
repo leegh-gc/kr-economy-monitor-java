@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}"
+      lang="ko">
+<head><title>부동산 현황</title></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- 페이지 타이틀 -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h2 class="h4 fw-bold mb-0">
+            <i class="bi bi-building text-primary me-2"></i>서울 부동산 현황
+        </h2>
+        <small class="text-muted">PostgreSQL DB + ECOS 데이터 기반</small>
+    </div>
+
+    <!-- KB 지수 차트 -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white fw-semibold">
+            <i class="bi bi-graph-up text-primary me-2"></i>서울 아파트 KB 매매지수 / 전세지수
+        </div>
+        <div class="card-body">
+            <div id="kb-index-loading" class="text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+            </div>
+            <canvas id="kbIndexChart" style="display:none; max-height:300px;"></canvas>
+        </div>
+    </div>
+
+    <!-- 권역 선택 + 구별 통계 -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex align-items-center gap-3 flex-wrap">
+            <span class="fw-semibold">
+                <i class="bi bi-map text-success me-2"></i>권역별 매매 / 전세 통계
+            </span>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <label for="zone-select" class="form-label mb-0 small">권역:</label>
+                <select id="zone-select" class="form-select form-select-sm" style="width:auto;" onchange="onZoneChange()">
+                    <option value="gangnam">강남권 (강남·서초·송파)</option>
+                    <option value="gangdong">강동권 (강동·노원·성동)</option>
+                    <option value="gangseo">강서권 (강서·영등포·양천)</option>
+                    <option value="gangbuk">강북권 (종로·마포·용산)</option>
+                </select>
+                <label for="district-select" class="form-label mb-0 small">구:</label>
+                <select id="district-select" class="form-select form-select-sm" style="width:auto;" onchange="onDistrictChange()">
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="stats-loading" class="text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+            </div>
+            <div id="stats-charts" style="display:none;">
+                <div class="row g-3">
+                    <div class="col-12 col-lg-6">
+                        <p class="fw-semibold small mb-1 text-primary">매매가 추이</p>
+                        <canvas id="saleStatsChart" style="max-height:260px;"></canvas>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <p class="fw-semibold small mb-1 text-warning">전세가 추이</p>
+                        <canvas id="leaseStatsChart" style="max-height:260px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP5 아파트 -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white fw-semibold">
+            <i class="bi bi-trophy text-warning me-2"></i>2026년 TOP5 아파트
+        </div>
+        <div class="card-body">
+            <div id="top5-loading" class="text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+            </div>
+            <div id="top5-content" style="display:none;">
+                <div class="row g-3">
+                    <div class="col-12 col-lg-6">
+                        <p class="fw-semibold small mb-2 text-primary">매매 TOP5</p>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>아파트명</th>
+                                        <th>동</th>
+                                        <th>준공</th>
+                                        <th class="text-end">평균가(만원)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sale-top5-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <p class="fw-semibold small mb-2 text-warning">전세 TOP5</p>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>아파트명</th>
+                                        <th>동</th>
+                                        <th>준공</th>
+                                        <th class="text-end">평균가(만원)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lease-top5-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 분석 섹션 -->
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold">
+                        <i class="bi bi-robot text-primary me-2"></i>AI 부동산 분석
+                    </span>
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadRealestateAnalysis()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>재분석
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="re-analysis-loading" class="text-center py-3 text-muted" style="display:none;">
+                        <div class="spinner-border spinner-border-sm me-2"></div>AI 분석 생성 중...
+                    </div>
+                    <div id="re-analysis-content" class="analysis-text text-muted small">
+                        버튼을 클릭하면 AI 분석을 시작합니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-image text-secondary me-2"></i>AI 컷툰
+                </div>
+                <div class="card-body text-center">
+                    <div id="re-cartoon-placeholder" class="text-muted small py-3">
+                        AI 분석 완료 후 컷툰이 생성됩니다.
+                    </div>
+                    <img id="re-cartoon-image" src="" alt="AI 컷툰" class="img-fluid rounded" style="display:none; max-height:300px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /content -->
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/realestate-charts.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initRealestatePage();
+        });
+    </script>
+</th:block>
+</body>
+</html>

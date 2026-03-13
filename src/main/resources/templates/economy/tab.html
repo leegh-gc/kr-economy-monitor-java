@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}"
+      lang="ko">
+<head><title>경제 현황</title></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- 페이지 타이틀 -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h2 class="h4 fw-bold mb-0">
+            <i class="bi bi-graph-up text-primary me-2"></i>한국 경제 현황
+        </h2>
+        <small class="text-muted">한국은행 ECOS 데이터 기반</small>
+    </div>
+
+    <!-- 차트 그리드 (8개 섹션) -->
+    <div class="row g-4">
+
+        <!-- 1. 금리 -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-percent text-warning me-2"></i>기준금리 및 국고채
+                </div>
+                <div class="card-body">
+                    <div id="interest-rate-loading" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+                    </div>
+                    <canvas id="interestRateChart" style="display:none; max-height:280px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. GDP -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-currency-dollar text-success me-2"></i>GDP / 1인당 국민소득
+                </div>
+                <div class="card-body">
+                    <div id="gdp-loading" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+                    </div>
+                    <canvas id="gdpChart" style="display:none; max-height:280px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 환율 -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-arrow-left-right text-info me-2"></i>환율 (USD / EUR / JPY / CNY)
+                </div>
+                <div class="card-body">
+                    <div id="exchange-rate-loading" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+                    </div>
+                    <canvas id="exchangeRateChart" style="display:none; max-height:280px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 물가 -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-tag text-danger me-2"></i>물가지수 (CPI / PPI)
+                </div>
+                <div class="card-body">
+                    <div id="price-index-loading" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+                    </div>
+                    <canvas id="priceIndexChart" style="display:none; max-height:280px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 무역 -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-ship text-primary me-2"></i>무역 / 경상수지
+                </div>
+                <div class="card-body">
+                    <div id="trade-loading" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+                    </div>
+                    <canvas id="tradeChart" style="display:none; max-height:280px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. 고용 -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-people text-success me-2"></i>고용 지표
+                </div>
+                <div class="card-body">
+                    <div id="employment-loading" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+                    </div>
+                    <canvas id="employmentChart" style="display:none; max-height:280px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. 통화 -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-bank text-warning me-2"></i>통화량 / 외환보유액
+                </div>
+                <div class="card-body">
+                    <div id="money-supply-loading" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+                    </div>
+                    <canvas id="moneySupplyChart" style="display:none; max-height:280px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. 인구 -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-person-badge text-info me-2"></i>인구 / 고령화 / 출산율
+                </div>
+                <div class="card-body">
+                    <div id="population-loading" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div>로딩 중...
+                    </div>
+                    <canvas id="populationChart" style="display:none; max-height:280px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /row -->
+
+    <!-- AI 분석 섹션 -->
+    <div class="row g-4 mt-2">
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold">
+                        <i class="bi bi-robot text-primary me-2"></i>AI 경제 분석
+                    </span>
+                    <button id="refresh-analysis-btn" class="btn btn-sm btn-outline-primary" onclick="loadEconomyAnalysis()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>재분석
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="analysis-loading" class="text-center py-3 text-muted" style="display:none;">
+                        <div class="spinner-border spinner-border-sm me-2"></div>AI 분석 생성 중...
+                    </div>
+                    <div id="analysis-content" class="analysis-text text-muted small">
+                        버튼을 클릭하면 AI 분석을 시작합니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-image text-secondary me-2"></i>AI 컷툰
+                </div>
+                <div class="card-body text-center">
+                    <div id="cartoon-placeholder" class="text-muted small py-3">
+                        AI 분석 완료 후 컷툰이 생성됩니다.
+                    </div>
+                    <img id="cartoon-image" src="" alt="AI 컷툰" class="img-fluid rounded" style="display:none; max-height:300px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /content -->
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/economy-charts.js}"></script>
+    <script>
+        // 페이지 로드 시 모든 차트 데이터 비동기 로드
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllEconomyCharts();
+        });
+    </script>
+</th:block>
+</body>
+</html>
